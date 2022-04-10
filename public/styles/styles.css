@@ -1,0 +1,35 @@
+h1{
+  text-align: center;
+  font-weight: 900;
+  font-size: 80px;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: palevioletred;
+}
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  button{
+    margin-left: 10px;
+    min-width: 100px;
+  }
+  .btnAdd{
+    width: 30%;
+    margin-top: 10px;
+  }
+  .email, .name, .id, .age{
+    padding-left: 100px;
+  }
+  form{
+    width: 50%;
+    margin-top: 5%;
+    margin-left: 20%;
+  }
