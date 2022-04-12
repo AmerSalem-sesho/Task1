@@ -1,27 +1,29 @@
 const express = require ('express');
 const router = express.Router();
 const Users = require('../Users/Users');
+var con = require("../Repository/config");
+var queries = require('../Repository/queries');
 var users = Users.Users;
 var count = Users.count;
 
 //this api call is to get all users
-router.get('/all',(req,res)=>{
-    var temp = users;
-res.render('select',{users:temp});
+router.get('/all',(req,rs)=>{
+    con.query(queries.getAll,(req,res)=>{
+          var temp = res;
+          rs.render('select',{users:temp});
+    });
 });
 
 router.get('/addUser',(req,res)=>{
 res.render('addUser');
 });
-router.get("/updateUser/:id",(req,res)=>{
-    users.forEach(user=>{
+router.get("/updateUser/:id",(req,rs)=>{
 
-        if(user.id === parseInt(req.params.id)){
-            res.render('updateUser',{users:user});
-        }
-    });
+        con.query(queries.getUser,req.params.id,(req,res)=>{
+            var user = res;
+            rs.render('updateUser',{users:user[0]});
 
-
+        });
 });
 //this api call is to find a user with a specific is
 router.get('/:id',(req,res)=>{
@@ -35,61 +37,31 @@ router.get('/:id',(req,res)=>{
 });
 
 //this api call is to add a new user
-router.post("/addUser",(req,res)=>{
-
-    const newUser ={
-        id : count++,
-        name : req.body.name,
-        email : req.body.email,
-        age:req.body.age
-    };
-
-    if(newUser.name == null || newUser.email == null || newUser.age == null)
-       res.status(400).json({msg:"Enter Name,Email and Age"});
-       else{
-       users.push(newUser);
-       res.redirect("/api/users/all")
-    }
+router.post("/addUser",(req,rs)=>{
+    con.query(queries.addUser,req.body,(req,res)=>{
+      rs.redirect("/api/users/all")
+    });
 });
 
 
 //this api call is to update an existing user
-router.post("/updateUser/:id",(req,res)=>{
-const exists = users.some(user=>user.id === parseInt(req.params.id));
- if(!exists)
- res.status(400).json({msg:`Cant find user with is ${req.params.id}`});
-else{
-  
-    users.forEach(user=>{
+router.post("/updateUser/:id",(req,rs)=>{
+    var param =[
+        req.body,
+        req.params.id
+    ];
+ con.query(queries.updateUser,param,(req,res)=>{
+    rs.redirect("/api/users/all");
 
-        if(user.id === parseInt(req.params.id)){
-            user.name =req.body.name?req.body.name : user.name;
-            user.email =req.body.email?req.body.email : user.email;
-            user.age =req.body.age?req.body.age : user.age;
-
-            res.redirect("/api/users/all")
-
-        }
-    });
-
-}
-
+ });
 });
-
 
 //this api is to delete a user 
 
-router.get("/deleteUser/:id",(req,res)=>{
-
-    const exists = users.some(user=>user.id === parseInt(req.params.id));
-    if(!exists)
-    res.status(400).json({msg:`Cant find user with is ${req.params.id}`});
-    else
-        {
-            users = users.filter(user=>user.id !== parseInt(req.params.id));
-            res.redirect("/api/users/all")
-        }
-
+router.get("/deleteUser/:id",(req,rs)=>{
+      con.query(queries.deleteUser,req.params.id,(req,res)=>{
+            rs.redirect("/api/users/all");
+      });
 });
 
 
